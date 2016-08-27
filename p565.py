@@ -2,10 +2,10 @@
 
 # Get number of divisors (cache results)
 numDivisors = {}
+primes = {}
 
 def numDiv(num):
     if num in numDivisors:
-        print(numDivisors)
         return numDivisors[num]
 
     if num == 0 or num == 1:
@@ -30,7 +30,7 @@ def omDiv(maxNum, divider):
     results = []
 
     for i in range(1, maxNum + 1):
-        if (i == int(maxNum / 100)):
+        if i % int(maxNum / 100) == 0:
             print(i / (maxNum / 100), "%")
 
         if omega(i) % divider == 0:

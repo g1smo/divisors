@@ -49,7 +49,7 @@ func numDiv(num uint64) *[]uint64 {
 	}
 
 	count := num / 2
-	for count > 1 && num%count != 0 {
+	for (count > 1) && (num%count != 0) {
 		count -= 1
 	}
 	factor := num / count
