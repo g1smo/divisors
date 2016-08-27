@@ -1,27 +1,33 @@
 #!/usr/bin/python
 
+import math
+
 # Get number of divisors (cache results)
-numDivisors = {}
-primes = {}
+numDivisors = {
+    0: set([1]),
+    1: set([1]),
+    2: set([1, 2])
+}
 
 def numDiv(num):
     if num in numDivisors:
         return numDivisors[num]
 
-    if num == 0 or num == 1:
-        numDivisors[num] = set([1])
-        return numDivisors[num]
+    count = 2
+    limit = int(math.sqrt(num))
+    while (num % count) != 0:
+        # Is number prime?
+        if count >= limit:
+            numDivisors[num] = set([num, 1])
+            return numDivisors[num]
 
-    count = int(num / 2)
-    while count > 1 and num % count != 0:
-        count -= 1
+        count += 1
 
-    subDivs = numDiv(count)
-    factor = int(num / count)
-    divisors = set([x * factor for x in subDivs]).union(subDivs)
+    divisors = numDiv(int(num / count))
+    divisors = divisors.union(set([x * count for x in divisors]))
 
     numDivisors[num] = divisors
-    return divisors
+    return numDivisors[num]
 
 def omega(num):
     return sum(numDiv(num))
