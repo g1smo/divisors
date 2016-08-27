@@ -1,6 +1,7 @@
 package main
 
 import "fmt"
+import "math"
 
 // Get number of divisors (cache results)
 var numDivisors = make(map[uint64]*[]uint64)
@@ -19,15 +20,6 @@ func remDupes(slice []uint64) *[]uint64 {
 	return &result
 }
 
-func containsNum(slice []uint64, num uint64) bool {
-	for _, el := range slice {
-		if el == num {
-			return true
-		}
-	}
-	return false
-}
-
 func arrMap(arr []uint64, f func(uint64) uint64) *[]uint64 {
 	result := make([]uint64, len(arr))
 
@@ -43,24 +35,24 @@ func numDiv(num uint64) *[]uint64 {
 		return val
 	}
 
-	if num == 0 || num == 1 {
-		numDivisors[num] = &[]uint64{1}
-		return numDivisors[num]
+	count := uint64(2)
+	limit := uint64(math.Sqrt(float64(num)))
+	for num%count != 0 {
+		// Is number prime?
+		if count >= limit {
+			numDivisors[num] = &[]uint64{num, 1}
+			return numDivisors[num]
+		}
+		count += 1
 	}
 
-	count := num / 2
-	for (count > 1) && (num%count != 0) {
-		count -= 1
-	}
-	factor := num / count
-
-	subDivs := numDiv(count)
-	mulDivisors := arrMap(*subDivs, func(num uint64) uint64 {
-		return num * factor
+	divisors := numDiv(num / count)
+	mulDivisors := arrMap(*divisors, func(x uint64) uint64 {
+		return x * count
 	})
-	divisors := *remDupes(append(*subDivs, *mulDivisors...))
+	divisors = remDupes(append(*divisors, *mulDivisors...))
 
-	numDivisors[num] = &divisors
+	numDivisors[num] = divisors
 	return numDivisors[num]
 }
 
@@ -82,8 +74,8 @@ func omDiv(maxNum uint64, divider uint64) uint64 {
 	results := []uint64{}
 
 	for i := uint64(1); i <= maxNum; i++ {
-		if i%(maxNum/100) == 0 {
-			fmt.Println(i/(maxNum/100), "%")
+		if i%(maxNum/1000) == 0 {
+			fmt.Println(float64(float64(i)/(float64(maxNum)/100)), "%")
 		}
 
 		if omega(i)%divider == 0 {
@@ -95,5 +87,9 @@ func omDiv(maxNum uint64, divider uint64) uint64 {
 }
 
 func main() {
+	numDivisors[0] = &[]uint64{1}
+	numDivisors[1] = &[]uint64{1}
+	numDivisors[2] = &[]uint64{1, 2}
+
 	fmt.Println(omDiv(1000000, 2017))
 }
