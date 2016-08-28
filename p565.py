@@ -4,9 +4,9 @@ import math
 
 # Get number of divisors (cache results)
 numDivisors = {
-    0: set([1]),
-    1: set([1]),
-    2: set([1, 2])
+    0: 1,
+    1: 1,
+    2: 3
 }
 
 def numDiv(num):
@@ -18,7 +18,7 @@ def numDiv(num):
     while (num % count) != 0:
         # Is number prime?
         if count >= limit:
-            numDivisors[num] = set([num, 1])
+            numDivisors[num] = num + 1
             return numDivisors[num]
 
         count += 1
@@ -28,19 +28,17 @@ def numDiv(num):
     numDivisors[num] = divisors
     return numDivisors[num]
 
-def omega(num):
-    return sum(numDiv(num))
-
 def omDiv(maxNum, divider):
-    results = []
+    results = 0
 
+    tick = int(maxNum/1000)
     for i in range(1, maxNum + 1):
-        if i % int(maxNum / 100) == 0:
+        if i % tick == 0:
             print(i / (maxNum / 100), "%")
 
-        if omega(i) % divider == 0:
-            results.append(i)
+        if numDiv(i) % divider == 0:
+            results += i
 
-    return sum(results)
+    return results
 
 print(omDiv(10**6, 2017))

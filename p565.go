@@ -4,9 +4,9 @@ import "fmt"
 import "math"
 
 // Get number of divisors (cache results)
-var numDivisors = make(map[uint64]map[uint64]bool)
+var numDivisors = make(map[uint64]uint64)
 
-func numDiv(num uint64) map[uint64]bool {
+func numDiv(num uint64) uint64 {
 	if val, ok := numDivisors[num]; ok {
 		return val
 	}
@@ -16,7 +16,7 @@ func numDiv(num uint64) map[uint64]bool {
 	for num%count != 0 {
 		// Is number prime?
 		if count >= limit {
-      numDivisors[num] = map[uint64]bool{num:true, 1:true}
+			numDivisors[num] = num + 1
 			return numDivisors[num]
 		}
 		count += 1
@@ -28,40 +28,27 @@ func numDiv(num uint64) map[uint64]bool {
 	return numDivisors[num]
 }
 
-func mapSum(numMap map[uint64]bool) uint64 {
-	sum := uint64(0)
-
-	for i := range numMap {
-		sum += i
-	}
-
-	return sum
-}
-
-func omega(num uint64) uint64 {
-	return mapSum(numDiv(num))
-}
-
 func omDiv(maxNum uint64, divider uint64) uint64 {
-	results := make(map[uint64]bool)
+	results := uint64(0)
 
+	tick := maxNum / 1000
 	for i := uint64(1); i <= maxNum; i++ {
-		if i%(maxNum/1000) == 0 {
+		if i%tick == 0 {
 			fmt.Println(float64(float64(i)/(float64(maxNum)/100)), "%")
 		}
 
-		if omega(i)%divider == 0 {
-      results[i] = true
+		if numDiv(i)%divider == 0 {
+			results += i
 		}
 	}
 
-	return mapSum(results)
+	return results
 }
 
 func main() {
-  numDivisors[0] = map[uint64]bool{1: true}
-  numDivisors[1] = map[uint64]bool{1: true}
-  numDivisors[2] = map[uint64]bool{1: true, 2: true}
+	numDivisors[0] = 1
+	numDivisors[1] = 1
+	numDivisors[2] = 3
 
 	fmt.Println(omDiv(1000000, 2017))
 }
