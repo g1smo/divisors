@@ -24,7 +24,6 @@ def numDiv(num):
         count += 1
 
     divisors = numDiv(int(num / count))
-    divisors = divisors.union(set([x * count for x in divisors]))
 
     numDivisors[num] = divisors
     return numDivisors[num]

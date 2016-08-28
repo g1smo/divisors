@@ -4,33 +4,9 @@ import "fmt"
 import "math"
 
 // Get number of divisors (cache results)
-var numDivisors = make(map[uint64]*[]uint64)
+var numDivisors = make(map[uint64]map[uint64]bool)
 
-func remDupes(slice []uint64) *[]uint64 {
-	ex := make(map[uint64]bool)
-
-	result := []uint64{}
-	for i := range slice {
-		if !ex[slice[i]] {
-			ex[slice[i]] = true
-			result = append(result, slice[i])
-		}
-	}
-
-	return &result
-}
-
-func arrMap(arr []uint64, f func(uint64) uint64) *[]uint64 {
-	result := make([]uint64, len(arr))
-
-	for i, val := range arr {
-		result[i] = f(val)
-	}
-
-	return &result
-}
-
-func numDiv(num uint64) *[]uint64 {
+func numDiv(num uint64) map[uint64]bool {
 	if val, ok := numDivisors[num]; ok {
 		return val
 	}
@@ -40,38 +16,34 @@ func numDiv(num uint64) *[]uint64 {
 	for num%count != 0 {
 		// Is number prime?
 		if count >= limit {
-			numDivisors[num] = &[]uint64{num, 1}
+      numDivisors[num] = map[uint64]bool{num:true, 1:true}
 			return numDivisors[num]
 		}
 		count += 1
 	}
 
 	divisors := numDiv(num / count)
-	mulDivisors := arrMap(*divisors, func(x uint64) uint64 {
-		return x * count
-	})
-	divisors = remDupes(append(*divisors, *mulDivisors...))
 
 	numDivisors[num] = divisors
 	return numDivisors[num]
 }
 
-func arrSum(array []uint64) uint64 {
+func mapSum(numMap map[uint64]bool) uint64 {
 	sum := uint64(0)
 
-	for i := 0; i < len(array); i++ {
-		sum += array[uint64(i)]
+	for i := range numMap {
+		sum += i
 	}
 
 	return sum
 }
 
 func omega(num uint64) uint64 {
-	return arrSum(*numDiv(num))
+	return mapSum(numDiv(num))
 }
 
 func omDiv(maxNum uint64, divider uint64) uint64 {
-	results := []uint64{}
+	results := make(map[uint64]bool)
 
 	for i := uint64(1); i <= maxNum; i++ {
 		if i%(maxNum/1000) == 0 {
@@ -79,17 +51,17 @@ func omDiv(maxNum uint64, divider uint64) uint64 {
 		}
 
 		if omega(i)%divider == 0 {
-			results = append(results, i)
+      results[i] = true
 		}
 	}
 
-	return arrSum(results)
+	return mapSum(results)
 }
 
 func main() {
-	numDivisors[0] = &[]uint64{1}
-	numDivisors[1] = &[]uint64{1}
-	numDivisors[2] = &[]uint64{1, 2}
+  numDivisors[0] = map[uint64]bool{1: true}
+  numDivisors[1] = map[uint64]bool{1: true}
+  numDivisors[2] = map[uint64]bool{1: true, 2: true}
 
 	fmt.Println(omDiv(1000000, 2017))
 }
